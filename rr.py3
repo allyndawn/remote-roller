@@ -6,8 +6,10 @@ import asyncio
 import os
 import random
 import serial
+import time
 
-from azure.iot.device.aio import IoTHubDeviceClient
+from awscrt import io
+from awsiot import mqtt_connection_builder
 from gpiozero import LED, Button
 
 my_roll = -1
@@ -15,11 +17,11 @@ their_roll = -1
 ser = serial.Serial()
 
 def lcdOut(line1, line2):
-    # TODO send clearing characters
-    ser.write(line1)
+    ser.write(b'\x7c\x2d')
+    ser.write(line1.encode())
     print(line1)
     if line2:
-        ser.write(line2)
+        ser.write(line2.encode())
         print(line2)
 
 def onButtonPressed():
@@ -30,86 +32,105 @@ def onMessageReceive():
     global their_roll
     their_roll = 11 #TODO get from message
 
-async def main():
-    global ser
-    global my_roll
-    global their_roll
+def onConnectionInterrupted(connection, error, **kwargs):
+    print("Connection interrupted. error: {}".format(error))
 
-    # Set up our GPIO devices
-    led = LED("J8:5")
-    button = Button("J8:7")
+def onConnectionResumed(connection, return_code, session_present, **kwargs):
+    print("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
 
-    # Set up the LCD
-    ser.port = '/dev/serial0'
-    ser.baudrate = 9600
-    ser.open()
+# Set up our GPIO devices
+led = LED("J8:5")
+button = Button("J8:7")
 
-    lcdOut("Starting up","")
-    await asyncio.sleep(1)
+# Set up the LCD
+ser.port = '/dev/serial0'
+ser.baudrate = 9600
+ser.open()
 
-    conn_str = os.getenv("IOTHUB_DEVICE_CONNECTION_STRING")
-    device_client = IoTHubDeviceClient.create_from_connection_string(conn_str)
+lcdOut("Starting up","")
+time.sleep(1)
 
-    # Connect the client.
-    await device_client.connect()
-    lcdOut("Connected!","")
-    await asyncio.sleep(1)
+# Set up the client.
+awsRootCAPath = os.getenv("AWS_ROOT_CA")
+awsIoTEndpoint = os.getenv("AWS_IOT_ENDPOINT")
+awsIoTCertificate = os.getenv("AWS_IOT_CERTIFICATE")
+awsIoTPrivateKey = os.getenv("AWS_IOT_PRIVATE_KEY")
+awsIoTThingName = os.getenv("AWS_IOT_THING_NAME")
 
-    # Listen for button events
-    button.when_pressed = onButtonPressed
+eventLoopGroup = io.EventLoopGroup(1)
+hostResolver = io.DefaultHostResolver(eventLoopGroup)
+clientBootstrap = io.ClientBootstrap(eventLoopGroup, hostResolver)
 
-    # Listen for messages from the IoT Hub
-    # TODO
+mqttConnection = mqtt_connection_builder.mtls_from_path(
+    endpoint=awsIoTEndpoint,
+    cert_filepath=awsIoTCertificate,
+    pri_key_filepath=awsIoTPrivateKey,
+    client_bootstrap=clientBootstrap,
+    ca_filepath=awsRootCAPath,
+    on_connection_interrupted=onConnectionInterrupted,
+    on_connection_resumed=onConnectionResumed,
+    client_id=awsIoTThingName,
+    clean_session=False,
+    keep_alive_secs=60)
 
-    # The main game loop. Exits on Ctrl-C. Runs forever.
-    try:
-        while True:
-            # Turn on LED solid
-            led.on()
-            lcdOut("Ready! Press", "button to roll")
+# Connect the client.
+connectFuture = mqttConnection.connect()
+connectFuture.result()
+lcdOut("Connected!","")
+time.sleep(1)
 
-            # Wait for either player to roll
-            while my_roll == -1 or their_roll == -1:
-                await asyncio.sleep(0.1)
+# Listen for button events
+button.when_pressed = onButtonPressed
 
-            # If we rolled first, blink LED slow
-            # If other player rolled first, blink LED fast
-            if my_roll != -1:
-                led.blink()
-                lcdOut("Waiting for", "opponent")
+# Listen for messages from the IoT Hub
+# TODO
 
-            if their_roll != -1:
-                led.blink()
-                lcdOut("Opponent rolled", "Waiting for you")
+# The main game loop. Exits on Ctrl-C. Runs forever.
+try:
+    while True:
+        # Turn on LED solid
+        led.on()
+        lcdOut("Ready! Press", "button to roll")
 
-            # Wait for remaining player to roll
-            while my_roll == -1 or their_roll == -1:
-                await asyncio.sleep(0.1)
+        # Wait for either player to roll
+        while my_roll == -1 or their_roll == -1:
+            time.sleep(0.1)
 
-            # Display result
-            led.off()
-            if my_roll > their_roll:
-                lcdOut("You won!", str(my_roll) + " > " + str(their_roll))
+        # If we rolled first, blink LED slow
+        # If other player rolled first, blink LED fast
+        if my_roll != -1:
+            led.blink()
+            lcdOut("Waiting for", "opponent")
 
-            if my_roll < their_roll:
-                lcdOut("They won!", str(my_roll) + " < " + str(their_roll))
+        if their_roll != -1:
+            led.blink()
+            lcdOut("Opponent rolled", "Waiting for you")
 
-            if my_roll > their_roll:
-                lcdOut("It's a tie!", str(my_roll) + " = " + str(their_roll))
+        # Wait for remaining player to roll
+        while my_roll == -1 or their_roll == -1:
+            time.sleep(0.1)
 
-            await asyncio.sleep(3)
+        # Display result
+        led.off()
+        if my_roll > their_roll:
+            lcdOut("You won!", str(my_roll) + " > " + str(their_roll))
 
-    except KeyboardInterrupt:
-        pass
+        if my_roll < their_roll:
+            lcdOut("They won!", str(my_roll) + " < " + str(their_roll))
 
-    # Shut down the MQTT client
-    await device_client.shutdown()
-    lcdOut("Disonnected!","")
-    await asyncio.sleep(1)
+        if my_roll > their_roll:
+            lcdOut("It's a tie!", str(my_roll) + " = " + str(their_roll))
 
-    # Close serial I/O
-    ser.close()
+        time.sleep(3)
 
-if __name__ == "__main__":
-    asyncio.run(main())
+except KeyboardInterrupt:
+    pass
 
+# Shut down the MQTT client
+disconnectFuture = mqttConnection.disconnect()
+disconnectFuture.result()
+lcdOut("Disconnected!","")
+time.sleep(1)
+
+# Close serial I/O
+ser.close()
