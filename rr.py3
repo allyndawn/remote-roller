@@ -57,6 +57,15 @@ def firstRollCast():
         return True
     return False
 
+def bothRollsCast():
+    global myRoll
+    global theirRoll
+    if myRoll < 0:
+        return False
+    if theirRoll < 0:
+        return False
+    return True
+
 # Set up our GPIO devices
 led = LED("J8:5")
 button = Button("J8:7")
@@ -146,7 +155,7 @@ try:
             lcdOut("Opponent rolled.", "Waiting for you")
 
         # Wait for remaining player to roll
-        while myRoll == -1 or theirRoll == -1:
+        while not bothRollsCast():
             time.sleep(0.1)
 
         # Display result
@@ -160,7 +169,7 @@ try:
         if myRoll > theirRoll:
             lcdOut("It's a tie!     ", str(myRoll) + " = " + str(theirRoll))
 
-        time.sleep(3)
+        time.sleep(10)
 
 except KeyboardInterrupt:
     pass
