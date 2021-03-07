@@ -3,18 +3,15 @@
 # February 13, 2021
 
 import asyncio
+import json
 import os
 import random
 import serial
 import time
 
-from awscrt import io
+from awscrt import io, mqtt
 from awsiot import mqtt_connection_builder
 from gpiozero import LED, Button
-
-my_roll = -1
-their_roll = -1
-ser = serial.Serial()
 
 def lcdOut(line1, line2):
     ser.write(b'\x7c\x2d')
@@ -25,12 +22,19 @@ def lcdOut(line1, line2):
         print(line2)
 
 def onButtonPressed():
-    global my_roll
-    my_roll = random.randint(1,20)
+    global myRoll
+    # Ingore button presses after they've already rolled for this round
+    if myRoll != -1:
+        return
 
-def onMessageReceive():
-    global their_roll
-    their_roll = 11 #TODO get from message
+    global mqttConnection
+    global pubTopic
+    myRoll = random.randint(1,20)
+    message = {"value" : myRoll}
+    mqttConnection.publish(
+        topic=pubTopic,
+        payload=json.dumps(message),
+        qos=mqtt.QoS.AT_LEAST_ONCE)
 
 def onConnectionInterrupted(connection, error, **kwargs):
     print("Connection interrupted. error: {}".format(error))
@@ -38,11 +42,17 @@ def onConnectionInterrupted(connection, error, **kwargs):
 def onConnectionResumed(connection, return_code, session_present, **kwargs):
     print("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
 
+def onMessageReceived(topic, payload, **kwargs):
+    print("Received message from topic '{}': {}".format(topic, payload))
+    global theirRoll
+    theirRoll = 11 #TODO get from message
+
 # Set up our GPIO devices
 led = LED("J8:5")
 button = Button("J8:7")
 
 # Set up the LCD
+ser = serial.Serial()
 ser.port = '/dev/serial0'
 ser.baudrate = 9600
 ser.open()
@@ -56,6 +66,15 @@ awsIoTEndpoint = os.getenv("AWS_IOT_ENDPOINT")
 awsIoTCertificate = os.getenv("AWS_IOT_CERTIFICATE")
 awsIoTPrivateKey = os.getenv("AWS_IOT_PRIVATE_KEY")
 awsIoTThingName = os.getenv("AWS_IOT_THING_NAME")
+
+opponentThingName = ""
+if awsIoTThingName == "player_one":
+    opponentThingName = "player_two"
+else:
+    opponentThingName = "player_one"
+
+pubTopic = awsIoTThingName + "/roll"
+subTopic = opponentThingName + "/roll"
 
 eventLoopGroup = io.EventLoopGroup(1)
 hostResolver = io.DefaultHostResolver(eventLoopGroup)
@@ -82,44 +101,54 @@ time.sleep(1)
 # Listen for button events
 button.when_pressed = onButtonPressed
 
-# Listen for messages from the IoT Hub
-# TODO
+# Subscribe
+subTopic = opponentThingName + "/roll"
+print("Subscribing to " + subTopic)
+subscribeFuture, packet_id = mqttConnection.subscribe(
+    topic=subTopic,
+    qos=mqtt.QoS.AT_LEAST_ONCE,
+    callback=onMessageReceived)
+
+subscribeResult = subscribeFuture.result()
+print("Subscribed!")
 
 # The main game loop. Exits on Ctrl-C. Runs forever.
 try:
     while True:
-        # Turn on LED solid
+        # Reset the game, Turn on LED solid
+        myRoll = -1
+        theirRoll = -1
         led.on()
         lcdOut("Ready! Press", "button to roll")
 
         # Wait for either player to roll
-        while my_roll == -1 or their_roll == -1:
+        while myRoll == -1 or theirRoll == -1:
             time.sleep(0.1)
 
         # If we rolled first, blink LED slow
         # If other player rolled first, blink LED fast
-        if my_roll != -1:
+        if myRoll != -1:
             led.blink()
             lcdOut("Waiting for", "opponent")
 
-        if their_roll != -1:
+        if theirRoll != -1:
             led.blink()
             lcdOut("Opponent rolled", "Waiting for you")
 
         # Wait for remaining player to roll
-        while my_roll == -1 or their_roll == -1:
+        while myRoll == -1 or theirRoll == -1:
             time.sleep(0.1)
 
         # Display result
         led.off()
-        if my_roll > their_roll:
-            lcdOut("You won!", str(my_roll) + " > " + str(their_roll))
+        if myRoll > theirRoll:
+            lcdOut("You won!", str(myRoll) + " > " + str(theirRoll))
 
-        if my_roll < their_roll:
-            lcdOut("They won!", str(my_roll) + " < " + str(their_roll))
+        if myRoll < theirRoll:
+            lcdOut("They won!", str(myRoll) + " < " + str(theirRoll))
 
-        if my_roll > their_roll:
-            lcdOut("It's a tie!", str(my_roll) + " = " + str(their_roll))
+        if myRoll > theirRoll:
+            lcdOut("It's a tie!", str(myRoll) + " = " + str(theirRoll))
 
         time.sleep(3)
 
