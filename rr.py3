@@ -23,6 +23,7 @@ def lcdOut(line1, line2):
 
 def onButtonPressed():
     global myRoll
+    print("Button pressed")
     # Ingore button presses after they've already rolled for this round
     if myRoll != -1:
         return
@@ -46,6 +47,15 @@ def onMessageReceived(topic, payload, **kwargs):
     print("Received message from topic '{}': {}".format(topic, payload))
     global theirRoll
     theirRoll = 11 #TODO get from message
+
+def firstRollCast():
+    global myRoll
+    global theirRoll
+    if myRoll > 0:
+        return True
+    if theirRoll > 0:
+        return True
+    return False
 
 # Set up our GPIO devices
 led = LED("J8:5")
@@ -119,21 +129,21 @@ try:
         myRoll = -1
         theirRoll = -1
         led.on()
-        lcdOut("Ready! Press", "button to roll")
+        lcdOut("Ready! Press    ", "button to roll")
 
         # Wait for either player to roll
-        while myRoll == -1 or theirRoll == -1:
+        while not firstRollCast():
             time.sleep(0.1)
 
         # If we rolled first, blink LED slow
         # If other player rolled first, blink LED fast
         if myRoll != -1:
             led.blink()
-            lcdOut("Waiting for", "opponent")
+            lcdOut("Waiting for     ", "opponent")
 
         if theirRoll != -1:
             led.blink()
-            lcdOut("Opponent rolled", "Waiting for you")
+            lcdOut("Opponent rolled.", "Waiting for you")
 
         # Wait for remaining player to roll
         while myRoll == -1 or theirRoll == -1:
@@ -142,13 +152,13 @@ try:
         # Display result
         led.off()
         if myRoll > theirRoll:
-            lcdOut("You won!", str(myRoll) + " > " + str(theirRoll))
+            lcdOut("You won!        ", str(myRoll) + " > " + str(theirRoll))
 
         if myRoll < theirRoll:
-            lcdOut("They won!", str(myRoll) + " < " + str(theirRoll))
+            lcdOut("They won!       ", str(myRoll) + " < " + str(theirRoll))
 
         if myRoll > theirRoll:
-            lcdOut("It's a tie!", str(myRoll) + " = " + str(theirRoll))
+            lcdOut("It's a tie!     ", str(myRoll) + " = " + str(theirRoll))
 
         time.sleep(3)
 
