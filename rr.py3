@@ -46,7 +46,8 @@ def onConnectionResumed(connection, return_code, session_present, **kwargs):
 def onMessageReceived(topic, payload, **kwargs):
     print("Received message from topic '{}': {}".format(topic, payload))
     global theirRoll
-    theirRoll = 11 #TODO get from message
+    message = json.loads(payload)
+    theirRoll = message["value"]
 
 def firstRollCast():
     global myRoll
@@ -166,7 +167,7 @@ try:
         if myRoll < theirRoll:
             lcdOut("They won!       ", str(myRoll) + " < " + str(theirRoll))
 
-        if myRoll > theirRoll:
+        if myRoll == theirRoll:
             lcdOut("It's a tie!     ", str(myRoll) + " = " + str(theirRoll))
 
         time.sleep(10)
