@@ -88,13 +88,16 @@ export AWS_IOT_THING_NAME="player_one"
 - `sudo apt-get update`
 - `sudo apt-get install cmake`
 - `sudo apt-get install libssl-dev`
+
+Install OpenCV. This command will take a long time to complete. Be sure to have your SSH client set with a keepalive
+
 - `pip install opencv-python --no-cache-dir`
 
 ## Raspberry Pi Testing
 - Use `raspistill -o ./image.jpg` to capture an image from the camera
 - Use the focus tool to adjust the image focus (the factory default is out at infinity)
 - Run `python3 serialtest.py3` and ensure "Hello World" is displayed on the LCD
-- Run `pyhton3 toggle.py3` and ensure pressing the pushbutton toggles the pushbutton LED
+- Run `python3 toggle.py3` and ensure pressing the pushbutton toggles the pushbutton LED
 - (Press Ctrl-C to exit)
 
 ## Monitor Testing
