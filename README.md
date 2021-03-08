@@ -2,9 +2,12 @@
 
 ## Hardware
 
+Two of each of the following. One for each "player"
+
 - [Raspberry Pi Zero W](https://www.raspberrypi.org/products/raspberry-pi-zero-w/)
 - [Raspberry Pi Camera V2.1](https://www.raspberrypi.org/products/camera-module-v2/)
 - [Raspbbery Pi Zero Camera Case](https://www.raspberrypi.org/products/raspberry-pi-zero-case/)
+- [Raspberry Pi Camera Focus Adjustment Tool](https://www.adafruit.com/product/3518)
 - [SparkFun 16x2 Serial LCD (16397)](https://www.sparkfun.com/products/16397)
 - [Lighted Pushbutton, Green, Momentary (1440)](https://www.adafruit.com/product/1440)
 - [Forged Gaming Dice Tray, White](https://forgedgaming.com/products/copy-of-dice-arena-dice-rolling-tray-and-storage?variant=11773653712932)
@@ -50,9 +53,21 @@
 - Save their certificates into a `.awskeys` folder on each device as you create them
 - Be sure to add the Policy created above to each Things certificates
 
+## Wiring
+
+- Connect the LCD RAW to 3.3V (e.g. J8:1)
+- Connect the LCD GND to GND (e.g. J8:6)
+- Connect the LCD RXD to GPIO 15 (TXD) (J8:8)
+- Connect the Pushbutton GND to GND (e.g. J8:9)
+- Connect the Pushbutton LED anode through a 330 ohm resistor to GPIO 9 (J8:5)
+- Connect one side of the Pushbutton switch to GPIO7 (J8:7)
+- Connect the Pushbutton LED cathode and other side of the Pushbutton switch to GND (e.g. J8:9)
+- Connect the camera to the Raspberry Pi 22-pin connector
+
 ## Raspberry Pi Configuration
 
 - Use `raspi-config` to disable the linux terminal and enable the serial port
+- Use `raspi-config` to enable the camera port
 - After doing this, ` ls -la /dev/serial0` should show `/dev/serial0 -> ttyS0`
 - Add the following to `~/.bashrc` (or `~/.zshenv`) replacing the xxx with your Thing's details
 - One Thing should be named `player_one` and the other `player_two`
@@ -75,13 +90,6 @@ export AWS_IOT_THING_NAME="player_one"
 - `sudo apt-get install libssl-dev`
 - `pip install opencv-python --no-cache-dir`
 
-## Wiring
-
-- Connect the LCD RAW to 3.3V (e.g. J8:1)
-- Connect the LCD GND to GND (e.g. J8:6)
-- Connect the LCD RXD to GPIO 15 (TXD) (J8:8)
-- Connect the Pushbutton GND to GND (e.g. J8:9)
-- Connect the Pushbutton LED anode through a 330 ohm resistor to GPIO 9 (J8:5)
-- Connect one side of the Pushbutton switch to GPIO7 (J8:7)
-- Connect the Pushbutton LED cathode and other side of the Pushbutton switch to GND (e.g. J8:9)
-- Connect the camera to the Raspberry Pi 22-pin connector
+## Testing
+- Use `raspistill -o ./image.jpg` to capture an image from the camera
+- Use the focus tool to adjust the image focus (the factory default is out at infinity)
