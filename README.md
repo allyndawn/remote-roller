@@ -7,10 +7,6 @@
 - [SparkFun 16x2 Serial LCD (16397)](https://www.sparkfun.com/products/16397)
 - [Lighted Pushbutton, Green, Momentary (1440)](https://www.adafruit.com/product/1440)
 
-## Software
-
-- Install the Amazon IoT SDK
-
 ## Cloud Setup
 
 - Login to your [AWS IoT Console](https://us-west-2.console.aws.amazon.com/iot/home?region=us-west-2#/thinghub)
@@ -45,14 +41,14 @@
 }
 ```
 
-- Login to your AWS console and create three things: `player_one`, `player_two` and `player_monitor`
+- Login to your AWS console and create three Things: `player_one`, `player_two` and `player_monitor`
 - Save their certificates into a `.awskeys` folder on each device as you create them
-- Be sure to add the policy created above to the the things certificates
+- Be sure to add the Policy created above to the the Things certificates
 
 ## Raspberry Pi Configuration
 
 - Use `raspi-config` to disable the linux terminal and enable the serial port
-- Add the following to `~/.bashrc` replacing the xxx with your Thing's details
+- Add the following to `~/.bashrc` (or `~/.zshenv`) replacing the xxx with your Thing's details
 - One thing should be named player_one and the other player_two
 - The monitoring system should be named player_monitor
 
@@ -64,3 +60,6 @@ export AWS_IOT_PRIVATE_KEY="/home/pi/.awskeys/xxxxxxxxxx-private.pem.key"
 export AWS_IOT_THING_NAME="player_one"
 
 ```
+- Run the following commands to set up dependencies
+- `python3 -m pip install awsiotsdk`
+- 
