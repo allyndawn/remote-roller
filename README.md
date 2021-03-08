@@ -19,7 +19,7 @@ Two of each of the following. One for each "player"
 
 - Login to your [AWS IoT Console](https://us-west-2.console.aws.amazon.com/iot/home?region=us-west-2#/thinghub)
 - Under Secure > Policies, create the following policy, name it `remote_roller_player_policy`
-- Replace xxx with your Thing Hub's ARN id
+- Note: The Resource ARN will be auto-filled for you as you add each Action. You will need to edit the end of the Resource to get the correct client, topic and topicfilters shown below. However, do not change the rest of the ARN.
 
 ```
 {
