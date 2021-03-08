@@ -6,6 +6,10 @@
 - [Raspberry Pi Camera V2.1](https://www.raspberrypi.org/products/camera-module-v2/)
 - [SparkFun 16x2 Serial LCD (16397)](https://www.sparkfun.com/products/16397)
 - [Lighted Pushbutton, Green, Momentary (1440)](https://www.adafruit.com/product/1440)
+- [Forged Gaming Dice Tray, White](https://forgedgaming.com/products/copy-of-dice-arena-dice-rolling-tray-and-storage?variant=11773653712932)
+- Dice
+- Chemistry Ring Stand
+- Miscellaneous hook up wires
 
 ## Cloud Setup
 
