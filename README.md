@@ -92,7 +92,7 @@ export AWS_IOT_THING_NAME="player_one"
 - `sudo apt-get install cmake`
 - `sudo apt-get install libssl-dev`
 
-Install OpenCV. This command will take a long time to complete. Be sure to have your SSH client set with a keepalive. Caching is disabled to avoid a common out-of-memory error on Raspberry Pis.
+Install OpenCV. This command will take a long time to complete - [up to "several hours"](https://pypi.org/project/opencv-python/). Be sure to have your SSH client set with a keepalive. Caching is disabled to avoid a common out-of-memory error on Raspberry Pis.
 
 - `pip install opencv-python --no-cache-dir`
 
