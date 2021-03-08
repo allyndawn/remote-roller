@@ -71,4 +71,5 @@ export AWS_IOT_THING_NAME="player_one"
 - `pip install pyserial`
 - `sudo apt-get update`
 - `sudo apt-get install cmake`
+- `sudo apt-get install libssl-dev`
 - `pip install opencv-python --no-cache-dir`
