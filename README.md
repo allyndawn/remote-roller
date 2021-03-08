@@ -81,6 +81,9 @@ export AWS_IOT_PRIVATE_KEY="/home/pi/.awskeys/xxxxxxxxxx-private.pem.key"
 export AWS_IOT_THING_NAME="player_one"
 
 ```
+- Run the following command to check WiFi signal strength. Update wpa_supplicant.conf to use strong networks.
+- `python3 iwlistparse.py`
+
 - Run the following commands to set up dependencies
 - `python3 -m pip install awsiotsdk`
 - `pip install gpiozero`
@@ -93,12 +96,15 @@ Install OpenCV. This command will take a long time to complete. Be sure to have 
 
 - `pip install opencv-python --no-cache-dir`
 
-## Raspberry Pi Testing
+## Raspberry Pi Pre-check
 - Use `raspistill -o ./image.jpg` to capture an image from the camera
 - Use the focus tool to adjust the image focus (the factory default is out at infinity)
 - Run `python3 serialtest.py3` and ensure "Hello World" is displayed on the LCD
 - Run `python3 toggle.py3` and ensure pressing the pushbutton toggles the pushbutton LED
 - (Press Ctrl-C to exit)
 
-## Monitor Testing
+## Launch the Monitor
 - Run `python3 monitor.py3` and ensure the device is able to connect to AWS
+
+## Launch the "Remote Roller" Script on each Raspberry Pi
+- Run `python3 rr.py3`, ensure each device is able to connect to AWS and enjoy the game!
