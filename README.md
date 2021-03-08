@@ -110,3 +110,12 @@ Install OpenCV. This command will take a long time to complete - [up to "several
 
 ## Launch the "Remote Roller" Script on each Raspberry Pi
 - Run `python3 rr.py3`, ensure each device is able to connect to AWS and enjoy the game!
+
+## Sample Images
+- Sample image before processing:
+
+![Before](/sampledata/image.jpg)
+
+- Sample image after processing:
+
+![After](/sampledata/processed.png)
