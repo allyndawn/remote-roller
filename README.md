@@ -62,4 +62,8 @@ export AWS_IOT_THING_NAME="player_one"
 ```
 - Run the following commands to set up dependencies
 - `python3 -m pip install awsiotsdk`
-- 
+- `pip install gpiozero`
+- `pip install pyserial`
+- `sudo apt-get update`
+- `sudo apt-get install cmake`
+- `pip install opencv-python --no-cache-dir`
