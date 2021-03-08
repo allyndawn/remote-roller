@@ -49,7 +49,7 @@ Two of each of the following. One for each "player"
 }
 ```
 
-- Login to your AWS console and create three Things: `player_one`, `player_two` and `player_monitor`
+- Next, under Manage > Things, create three Things: `player_one`, `player_two` and `player_monitor`
 - Save their certificates into a `.awskeys` folder on each device as you create them
 - Be sure to add the Policy created above to each Things certificates
 
