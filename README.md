@@ -43,7 +43,7 @@
 
 - Login to your AWS console and create three Things: `player_one`, `player_two` and `player_monitor`
 - Save their certificates into a `.awskeys` folder on each device as you create them
-- Be sure to add the Policy created above to the the Things certificates
+- Be sure to add the Policy created above to each Things certificates
 
 ## Raspberry Pi Configuration
 
