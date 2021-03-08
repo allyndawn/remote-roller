@@ -123,3 +123,4 @@ Install OpenCV. This command will take a long time to complete - [up to "several
 ## Props
 
 - Quentin Golsteyn https://golsteyn.com/projects/dice/ for a great example of using OpenCV to read dice
+- Hugo Chargois for his WiFi strength parsing script (iwlistparse.py)
