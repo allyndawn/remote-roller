@@ -48,9 +48,10 @@
 ## Raspberry Pi Configuration
 
 - Use `raspi-config` to disable the linux terminal and enable the serial port
+- After doing this, ` ls -la /dev/serial0` should show `/dev/serial0 -> ttyS0`
 - Add the following to `~/.bashrc` (or `~/.zshenv`) replacing the xxx with your Thing's details
-- One thing should be named player_one and the other player_two
-- The monitoring system should be named player_monitor
+- One Thing should be named `player_one` and the other `player_two`
+- The monitoring system should be named `player_monitor`
 
 ```
 export AWS_ROOT_CA="/home/pi/.awskeys/AmazonRootCA1.pem"
