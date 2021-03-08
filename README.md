@@ -103,7 +103,7 @@ Install OpenCV. This command will take a long time to complete. Be sure to have 
 - Run `python3 toggle.py3` and ensure pressing the pushbutton toggles the pushbutton LED
 - (Press Ctrl-C to exit)
 - Run `python3 dicereader.py3` and ensure it is able to count the pips on `image.jpg` captured above
-- You can examine the processed.png output file to see what it saw
+- You can examine the `processed.png` output file to see what it saw
 
 ## Launch the Monitor
 - Run `python3 monitor.py3` and ensure the device is able to connect to AWS
