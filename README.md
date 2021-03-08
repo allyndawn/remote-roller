@@ -1,5 +1,9 @@
 # remote-roller
 
+An AWS IoT powered MQTT based two terminal dice rolling game using Raspberry Pi Zero W and OpenCV.
+
+Work in progress.
+
 ## Hardware
 
 Two of each of the following. One for each "player"
