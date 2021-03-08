@@ -4,6 +4,7 @@
 
 - [Raspberry Pi Zero W](https://www.raspberrypi.org/products/raspberry-pi-zero-w/)
 - [Raspberry Pi Camera V2.1](https://www.raspberrypi.org/products/camera-module-v2/)
+- [Raspbbery Pi Zero Camera Case](https://www.raspberrypi.org/products/raspberry-pi-zero-case/)
 - [SparkFun 16x2 Serial LCD (16397)](https://www.sparkfun.com/products/16397)
 - [Lighted Pushbutton, Green, Momentary (1440)](https://www.adafruit.com/product/1440)
 - [Forged Gaming Dice Tray, White](https://forgedgaming.com/products/copy-of-dice-arena-dice-rolling-tray-and-storage?variant=11773653712932)
@@ -73,3 +74,14 @@ export AWS_IOT_THING_NAME="player_one"
 - `sudo apt-get install cmake`
 - `sudo apt-get install libssl-dev`
 - `pip install opencv-python --no-cache-dir`
+
+## Wiring
+
+- Connect the LCD RAW to 3.3V (e.g. J8:1)
+- Connect the LCD GND to GND (e.g. J8:6)
+- Connect the LCD RXD to GPIO 15 (TXD) (J8:8)
+- Connect the Pushbutton GND to GND (e.g. J8:9)
+- Connect the Pushbutton LED anode through a 330 ohm resistor to GPIO 9 (J8:5)
+- Connect one side of the Pushbutton switch to GPIO7 (J8:7)
+- Connect the Pushbutton LED cathode and other side of the Pushbutton switch to GND (e.g. J8:9)
+- Connect the camera to the Raspberry Pi 22-pin connector
