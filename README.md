@@ -70,9 +70,14 @@ Two of each of the following. One for each "player"
 
 ## Raspberry Pi Configuration
 
-- Use `raspi-config` to disable the linux terminal and enable the serial port
-- Use `raspi-config` to enable the camera port
+- Connect an HDMI cable and keyboard
+- Wait for the GUI to boot.
+- Complete setup.
+- Open Preferences (under the Raspberry) and select Boot to CLI (not GUI)
+- Use the GUI or `raspi-config` to disable the linux terminal and enable the serial port
+- Use the GUI or `raspi-config` to enable the camera port
 - After doing this, ` ls -la /dev/serial0` should show `/dev/serial0 -> ttyS0`
+- Reboot (to CLI)
 - Add the following to `~/.bashrc` (or `~/.zshenv`) replacing the xxx with your Thing's details
 - One Thing should be named `player_one` and the other `player_two`
 - The monitoring system should be named `player_monitor`
