@@ -34,11 +34,15 @@ def onButtonPressed():
     # Capture the image
     imagePath = "./image.jpg"
     lcdOut("Capturing image ", "Please wait...")
+    t1 = time.time()
     subprocess.run(["/usr/bin/raspistill", "-o", imagePath])
+    t2 = time.time()
 
     # Analyze the image
     lcdOut("Analyzing image ", "Please wait...")
+    t3 = time.time()
     myRoll = countPipsInImage(imagePath)
+    t4 = time.time()
     print("I count ", myRoll)
 
     # Publish the count
@@ -46,7 +50,8 @@ def onButtonPressed():
     global mqttConnection
     global pubTopic
     # myRoll = random.randint(1,20)
-    message = {"value" : myRoll}
+    t5 = time.time()
+    message = {"value" : myRoll, "acqtime" : t2-t1, "proctime": t4-t3, "pubtime": t5}
     mqttConnection.publish(
         topic=pubTopic,
         payload=json.dumps(message),
@@ -59,10 +64,14 @@ def onConnectionResumed(connection, return_code, session_present, **kwargs):
     print("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
 
 def onMessageReceived(topic, payload, **kwargs):
+    t5 = time.time()
     print("Received message from topic '{}': {}".format(topic, payload))
     global theirRoll
     message = json.loads(payload)
     theirRoll = message["value"]
+    if "pubtime" in message:
+        t6 = message["pubtime"]
+        print("pubsub delay:", t6-t5)
 
 def firstRollCast():
     global myRoll
@@ -103,9 +112,9 @@ def countPipsInImage(imagePath):
     image = cv2.imread(imagePath)
     imageHeight, imageWidth, imageColorPlanes = image.shape
 
-    cropX1 = int(0.35 * imageWidth)
+    cropX1 = int(0.33 * imageWidth)
     cropX2 = int(0.67 * imageWidth)
-    cropY1 = int(0.3 * imageHeight)
+    cropY1 = int(0.28 * imageHeight)
     cropY2 = int(0.7 * imageHeight)
 
     # Crop the image
