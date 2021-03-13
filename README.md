@@ -70,9 +70,14 @@ Two of each of the following. One for each "player"
 
 ## Raspberry Pi Configuration
 
-- Use `raspi-config` to disable the linux terminal and enable the serial port
-- Use `raspi-config` to enable the camera port
+- Connect an HDMI cable and keyboard
+- Wait for the GUI to boot.
+- Complete setup.
+- Open Preferences (under the Raspberry) and select Boot to CLI (not GUI)
+- Use the GUI or `raspi-config` to disable the linux terminal and enable the serial port
+- Use the GUI or `raspi-config` to enable the camera port
 - After doing this, ` ls -la /dev/serial0` should show `/dev/serial0 -> ttyS0`
+- Reboot (to CLI)
 - Add the following to `~/.bashrc` (or `~/.zshenv`) replacing the xxx with your Thing's details
 - One Thing should be named `player_one` and the other `player_two`
 - The monitoring system should be named `player_monitor`
@@ -89,16 +94,29 @@ export AWS_IOT_THING_NAME="player_one"
 - `python3 iwlistparse.py`
 
 - Run the following commands to set up dependencies
-- `python3 -m pip install awsiotsdk`
-- `pip install gpiozero`
-- `pip install pyserial`
-- `sudo apt-get update`
-- `sudo apt-get install cmake`
-- `sudo apt-get install libssl-dev`
-
-Install OpenCV. This command will take a long time to complete - [up to "several hours"](https://pypi.org/project/opencv-python/). Be sure to have your SSH client set with a keepalive. Caching is disabled to avoid a common out-of-memory error on Raspberry Pis.
-
-- `pip install opencv-python --no-cache-dir --verbose`
+```
+python3 -m pip install awsiotsdk
+pip install gpiozero
+pip install pyserial
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install libssl-dev
+sudo apt-get install build-essential cmake pkg-config
+sudo apt-get install libjpeg-dev libtiff5-dev libjasper-dev libpng12-dev
+sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+sudo apt-get install libxvidcore-dev libx264-dev
+sudo apt-get install libgtk2.0-dev libgtk-3-dev
+sudo apt-get install libatlas-base-dev gfortran
+sudo apt-get install libqtgui4
+sudo modprobe bcm2835-v4l2
+sudo apt-get install libqt4-test
+sudo apt-get install python3-dev
+sudo apt-get install python3-pip
+pip3 install opencv-python
+sudo apt-get install python-opencv
+pip install numpy
+pip install sklearn
+```
 
 ## Raspberry Pi Pre-check
 - Use `raspistill -o ./image.jpg` to capture an image from the camera
@@ -128,3 +146,4 @@ Install OpenCV. This command will take a long time to complete - [up to "several
 
 - Quentin Golsteyn https://golsteyn.com/projects/dice/ for a great example of using OpenCV to read dice
 - Hugo Chargois for his WiFi strength parsing script (iwlistparse.py)
+- Unlocked Lab for [OpenCV Raspberry Pi setup instructions](https://www.youtube.com/watch?v=cmPz6bfIOEU) that work!
