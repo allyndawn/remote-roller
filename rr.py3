@@ -115,7 +115,7 @@ def countPipsInImage(imagePath):
     cropX1 = int(0.33 * imageWidth)
     cropX2 = int(0.67 * imageWidth)
     cropY1 = int(0.28 * imageHeight)
-    cropY2 = int(0.7 * imageHeight)
+    cropY2 = int(0.71 * imageHeight)
 
     # Crop the image
     croppedImage = image[cropY1:cropY2, cropX1:cropX2]
