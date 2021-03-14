@@ -63,15 +63,19 @@ def onConnectionInterrupted(connection, error, **kwargs):
 def onConnectionResumed(connection, return_code, session_present, **kwargs):
     print("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
 
-def onMessageReceived(topic, payload, **kwargs):
+def onMessageReceivedSelf(topic, payload, **kwargs):
     t5 = time.time()
+    print("Received message from topic '{}': {}".format(topic, payload))
+    message = json.loads(payload)
+    if "pubtime" in message:
+        t6 = message["pubtime"]
+        print("pubsub delay:", t5-t6)
+
+def onMessageReceivedOpp(topic, payload, **kwargs):
     print("Received message from topic '{}': {}".format(topic, payload))
     global theirRoll
     message = json.loads(payload)
     theirRoll = message["value"]
-    if "pubtime" in message:
-        t6 = message["pubtime"]
-        print("pubsub delay:", t6-t5)
 
 def firstRollCast():
     global myRoll
@@ -196,16 +200,25 @@ time.sleep(1)
 # Listen for button events
 button.when_pressed = onButtonPressed
 
-# Subscribe
-subTopic = opponentThingName + "/roll"
-print("Subscribing to " + subTopic)
-subscribeFuture, packet_id = mqttConnection.subscribe(
-    topic=subTopic,
+# Subscribe to our own rolls for latency measurement
+subTopicSelf = awsIoTThingName + "/roll"
+print("Subscribing to " + subTopicSelf)
+subscribeSelfFuture, packetSelfId = mqttConnection.subscribe(
+    topic=subTopicSelf,
     qos=mqtt.QoS.AT_LEAST_ONCE,
-    callback=onMessageReceived)
+    callback=onMessageReceivedSelf)
+subscribeResultSelf = subscribeSelfFuture.result()
+print("Subscribed to self rolls")
 
-subscribeResult = subscribeFuture.result()
-print("Subscribed!")
+# Subscribe to opponent rolls
+subTopicOpp = opponentThingName + "/roll"
+print("Subscribing to " + subTopicOpp)
+subscribeOppFuture, packetOppId = mqttConnection.subscribe(
+    topic=subTopicOpp,
+    qos=mqtt.QoS.AT_LEAST_ONCE,
+    callback=onMessageReceivedOpp)
+subscribeResultOpp = subscribeOppFuture.result()
+print("Subscribed to opponent rolls")
 
 # The main game loop. Exits on Ctrl-C. Runs forever.
 try:
