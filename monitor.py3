@@ -16,7 +16,12 @@ def onConnectionResumed(connection, return_code, session_present, **kwargs):
     print("Connection resumed. return_code: {} session_present: {}".format(return_code, session_present))
 
 def onMessageReceived(topic, payload, **kwargs):
+    t5 = time.time()
     print("Received message from topic '{}': {}".format(topic, payload))
+    message = json.loads(payload)
+    if "pubtime" in message:
+        t6 = message["pubtime"]
+        print("pubsub delay:", t6-t5)
 
 # Set up the client.
 awsRootCAPath = os.getenv("AWS_ROOT_CA")
